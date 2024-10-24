@@ -10,10 +10,15 @@ namespace AzureBlobStorage.Services
             this.Configuration = configuration;
         }
 
+        /// <summary>
+        /// Get Container
+        /// </summary>
+        /// <param name="containerName"></param>
+        /// <returns> containerClient </returns>
         public async Task<BlobContainerClient> GetBlobContainerClientAsync(string containerName)
         {
-            var conexao = Configuration.GetConnectionString("BlobConnectionString");
-            BlobServiceClient serviceClient = new BlobServiceClient(conexao);
+            var connection = Configuration.GetConnectionString("BlobConnectionString");
+            BlobServiceClient serviceClient = new BlobServiceClient(connection);
             BlobContainerClient containerClient = serviceClient.GetBlobContainerClient(containerName);
 
             await containerClient.CreateIfNotExistsAsync();
