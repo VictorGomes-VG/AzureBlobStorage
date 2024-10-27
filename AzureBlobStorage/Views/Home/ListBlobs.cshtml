@@ -1,4 +1,4 @@
-﻿
+﻿@model IEnumerable<string>
 @{
     ViewData["Title"] = "ListBlobs";
 }
@@ -9,3 +9,22 @@
 </div>
 <hr />
 
+@if (Model.Count() > 0)
+{
+        <div class="row">
+        @foreach (var item in Model)
+        {
+                    <div class="col-sm-2">           	 
+                        <img src="@item" class="img-fluid" width="150" />           	 
+                    </div>
+        }
+        </div>
+}
+else
+{
+        <div class="alert alert-warning" role="alert">
+            Nenhum blob disponível para exibição
+        </div>
+}
+
+</div>

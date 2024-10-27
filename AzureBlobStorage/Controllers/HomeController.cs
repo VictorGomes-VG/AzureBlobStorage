@@ -20,9 +20,10 @@ namespace AzureBlobStorage.Controllers
         }
 
         [HttpGet]
-        public IActionResult ListBlobs()
+        public async Task<IActionResult> ListBlobs()
         {
-            return View();
+            IEnumerable<string> blobs = await blobsService.GetAllBlobs();
+            return View(blobs);
         }
 
         [HttpGet]

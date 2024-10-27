@@ -1,4 +1,6 @@
 ﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using Azure.Storage.Sas;
 
 namespace AzureBlobStorage.Services
 {
@@ -33,6 +35,41 @@ namespace AzureBlobStorage.Services
             BlobClient blobClient = containerClient.GetBlobClient(blob);
 
             await blobClient.UploadAsync($"D:/azure/imagens/{blob}");
+        }
+
+        public async Task<List<string>> GetAllBlobs()
+        {
+            var connection = Configuration.GetConnectionString("BlobConnectionString");
+            BlobServiceClient serviceClient = new BlobServiceClient(connection);
+
+            var container = Configuration["BlobContainerName"];
+            BlobContainerClient containerClient = await GetBlobContainerClientAsync(container!);
+
+            List<string> results = new List<string>();
+
+            if (await containerClient.ExistsAsync())
+            {
+                BlobClient blobClient;
+                BlobSasBuilder blobSasBuilder;
+                await foreach (BlobItem blobItem in containerClient.GetBlobsAsync())
+                {
+                    blobClient = containerClient.GetBlobClient(blobItem.Name);
+
+                    blobSasBuilder = new BlobSasBuilder()
+                    {
+                        BlobContainerName = containerClient.Name,
+                        BlobName = blobItem.Name,
+                        ExpiresOn = DateTime.UtcNow.AddMinutes(5),
+                        Protocol = SasProtocol.Https
+                    };
+                    blobSasBuilder.SetPermissions(BlobSasPermissions.Read);
+
+                    //results.Add(blobClient.Uri.ToString());
+                    results.Add(blobClient.GenerateSasUri(blobSasBuilder).AbsolutePath);
+                }
+            }
+
+            return results;  
         }
     }
 }
